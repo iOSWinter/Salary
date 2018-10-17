@@ -3,7 +3,7 @@
             <div class="byYear"><input type="checkbox" name="byYear" @click="byYearClick"><p>按自然年汇总</p></div>
             <div class="date">
                 <p>日期范围</p>
-                <input name="startDate" @click="showLaydate">至<input name="endDate" @click="showLaydate">
+                <input name="startDate" v-model="startDate" placeholder="开始日期">至<input name="endDate" v-model="endDate" placeholder="结束日期">
             </div>
             <div class="items">
                 <div><p>个人收入类别</p></div>                
@@ -55,17 +55,28 @@ export default {
     },
     data(){
         return {
+            startDate:'',
+            endDate:'',
             items:[]
         }
     },
     methods:{
-        showLaydate(){
+        renderStartDate(){
             laydate.render({
                 elem: 'input[name="startDate"]',
-                // type: 'month',
-                // format: 'yyyy年M月',
-                // value: this.startDate,
-                // btns: ['clear', 'confirm']
+                type: 'month',
+                format: 'yyyy年M月',
+                value: this.startDate,
+                btns: ['clear', 'confirm']
+            });
+        },
+        renderEndDate(){
+            laydate.render({
+                elem: 'input[name="endDate"]',
+                type: 'month',
+                format: 'yyyy年M月',
+                value: this.endDate,
+                btns: ['clear', 'confirm']
             });
         },
         clickLabel(e){
@@ -110,8 +121,7 @@ export default {
                 this.layer.msg("没有选择筛选项", {time : 1000});
                 return;
             }
-            localStorage.setItem("searchItems",JSON.stringify(this.items));
-            this.$router.push({name:'summaryLink'});
+            this.$router.push({name:'summaryLink',params:{items:this.items}});
         },
         byYearClick(e){
             let name = e.target.getAttribute("name");
@@ -134,13 +144,20 @@ export default {
             }
         }
     },
-    mounted(){
-        let items = localStorage.getItem("searchItems");
-        if(!items){
-            items = ["theorySalary","mealCost","retirement","medical","unemployment","birth","industrialInjury","bigMedical","houseFund","tax","theorySalaryC","retirementC","medicalC","unemploymentC","birthC","industrialInjuryC","bigMedicalC","houseFundC"];
-        } else {
-            items = JSON.parse(items);
+    created(){
+        if(this.$route.params.startDate != undefined){
+            this.startDate = this.$route.params.startDate;
         }
+        if(this.$route.params.endDate != undefined){
+            this.endDate = this.$route.params.endDate;
+        }
+        let date = new Date();
+        this.startDate = `${date.getFullYear() - 1}年${date.getMonth() + 1}月`;
+        this.endDate = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+    },
+    mounted(){
+        let items = this.$route.params.items;
+        items = items ? items : ["theorySalary","mealCost","retirement","medical","unemployment","birth","industrialInjury","bigMedical","houseFund","tax","theorySalaryC","retirementC","medicalC","unemploymentC","birthC","industrialInjuryC","bigMedicalC","houseFundC"];
         for(let i = 0; i < items.length; i++)
         {
             let item = items[i];
@@ -152,6 +169,9 @@ export default {
         }
         this.items.push(...items);       
         this.checkAllStatus(); 
+
+        this.renderStartDate();
+        this.renderEndDate();
     }
 }
 </script>
@@ -199,6 +219,7 @@ export default {
         height: 30px;
         outline: none;
         padding: 0 5px;
+        color: black;
     }
     #summary-filter>.items{
         text-align: left;

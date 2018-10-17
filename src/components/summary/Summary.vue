@@ -2,9 +2,9 @@
     <div id="summary">
 
         <div class="top">
-            <router-link to="/summaryfilter">
+            <a @click="filterClick">
                 <p>{{startDate}}—{{endDate}}</p>
-            </router-link>            
+            </a>            
         </div>
         <div id="chart"></div>  
         <a class="share" @click="shareImage">分享图片</a>
@@ -46,16 +46,25 @@ export default {
             income:0,
             outcome:0,
             companyOutcome:0,
-            items:["theorySalary","mealCost","retirement","medical","unemployment","birth","industrialInjury","bigMedical","houseFund","tax","theorySalaryC","retirementC","medicalC","unemploymentC","birthC","industrialInjuryC","bigMedicalC","houseFundC"],
-            startDate:'2017年1月',
-            endDate:'2018年9月',
+            items:[],
+            defaultItems:["theorySalary","mealCost","retirement","medical","unemployment","birth","industrialInjury","bigMedical","houseFund","tax","theorySalaryC","retirementC","medicalC","unemploymentC","birthC","industrialInjuryC","bigMedicalC","houseFundC"],
+            startDate:'',
+            endDate:'',
             myChart:''
         }
     },
+    created(){
+        let date = new Date();
+        this.startDate = `${date.getFullYear() - 1}年${date.getMonth() + 1}月`;
+        this.endDate = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+    },
     mounted(){
+        let items = this.$route.params.items;
         let index = this.layer.load();
-        let items = localStorage.getItem("searchItems");
-        this.http.post("GetTotalSummary",{startDate:this.startDate,endDate:this.endDate,items:items ? JSON.parse(items) : this.items})
+        items = items ? items : this.defaultItems;
+        this.items.splice(0,this.items.length);
+        this.items.push(...items);
+        this.http.post("GetTotalSummary",{startDate:this.startDate,endDate:this.endDate,items:this.items})
         .then(res => {
             this.layer.close(index);
             this.xValues = res.data.data.keys;
@@ -65,13 +74,19 @@ export default {
             this.companyOutcome = res.data.data.totalCompanyOutcome;
             this.drawLineByData();
         })
-        .catch(err => {            
+        .catch(err => {
             this.layer.close(index);
             this.layer.msg("网络错误");
         })
         this.drawLine();
     },
     methods: {
+        filterClick(e){
+            let title = e.target.innerText;
+            let index = title.indexOf("—");
+            
+            this.$router.push({name:'summaryfilterLink', params:{startDate:title.substring(0,index),endDate:title.substring(index + 1,title.length),items:this.items}});
+        },
         drawLine(){
             let myChart = echarts.init(document.getElementById('chart'), 'macarons');
             myChart.optionNoImage = null;
