@@ -179,22 +179,22 @@ export default {
     },
     methods:{
         calcInsurance(){
-            this.retirement = (this.base < this.ratio.retirementBase ? this.ratio.retirementBase : this.base) * this.ratio.retirement;
-            this.medical = (this.base < this.ratio.medicalBase ? this.ratio.medicalBase : this.base) * this.ratio.medical;
-            this.unemployment = (this.base < this.ratio.unemploymentBase ? this.ratio.unemploymentBase : this.base) * this.ratio.unemployment;
-            this.birth = (this.base < this.ratio.birthBase ? this.ratio.birthBase : this.base) * this.ratio.birth;
-            this.industrialInjury = (this.base < this.ratio.industrialInjuryBase ? this.ratio.industrialInjuryBase : this.base) * this.ratio.industrialInjury;
-            this.bigMedical = (this.base < this.ratio.bigMedicalBase ? this.ratio.bigMedicalBase : this.base) * this.ratio.bigMedical;
-            this.houseFund = (this.base < this.ratio.houseFundBase ? this.ratio.houseFundBase : this.base) * this.ratio.houseFund;
+            this.retirement = Number.parseFloat(((this.base < this.ratio.retirementBase ? this.ratio.retirementBase : this.base) * this.ratio.retirement).toFixed(2));
+            this.medical = Number.parseFloat(((this.base < this.ratio.medicalBase ? this.ratio.medicalBase : this.base) * this.ratio.medical).toFixed(2));
+            this.unemployment = Number.parseFloat(((this.base < this.ratio.unemploymentBase ? this.ratio.unemploymentBase : this.base) * this.ratio.unemployment).toFixed(2));
+            this.birth = Number.parseFloat(((this.base < this.ratio.birthBase ? this.ratio.birthBase : this.base) * this.ratio.birth).toFixed(2));
+            this.industrialInjury = Number.parseFloat(((this.base < this.ratio.industrialInjuryBase ? this.ratio.industrialInjuryBase : this.base) * this.ratio.industrialInjury).toFixed(2));
+            this.bigMedical = Number.parseFloat(((this.base < this.ratio.bigMedicalBase ? this.ratio.bigMedicalBase : this.base) * this.ratio.bigMedical).toFixed(2));
+            this.houseFund = Number.parseFloat(((this.base < this.ratio.houseFundBase ? this.ratio.houseFundBase : this.base) * this.ratio.houseFund).toFixed(0));
 
 
-            this.retirementC = (this.base < this.ratio.retirementBase ? this.ratio.retirementBase : this.base) * this.ratio.retirementC;
-            this.medicalC = (this.base < this.ratio.medicalBase ? this.ratio.medicalBase : this.base) * this.ratio.medicalC;
-            this.unemploymentC = (this.base < this.ratio.unemploymentBase ? this.ratio.unemploymentBase : this.base) * this.ratio.unemploymentC;
-            this.birthC = (this.base < this.ratio.birthBase ? this.ratio.birthBase : this.base) * this.ratio.birthC;
-            this.industrialInjuryC = (this.base < this.ratio.industrialInjuryBase ? this.ratio.industrialInjuryBase : this.base) * this.ratio.industrialInjuryC;
-            this.bigMedicalC = (this.base < this.ratio.bigMedicalBase ? this.ratio.bigMedicalBase : this.base) * this.ratio.bigMedicalC;
-            this.houseFundC = (this.base < this.ratio.houseFundBase ? this.ratio.houseFundBase : this.base) * this.ratio.houseFundC;
+            this.retirementC = Number.parseFloat(((this.base < this.ratio.retirementBase ? this.ratio.retirementBase : this.base) * this.ratio.retirementC).toFixed(2));
+            this.medicalC = Number.parseFloat(((this.base < this.ratio.medicalBase ? this.ratio.medicalBase : this.base) * this.ratio.medicalC).toFixed(2));
+            this.unemploymentC = Number.parseFloat(((this.base < this.ratio.unemploymentBase ? this.ratio.unemploymentBase : this.base) * this.ratio.unemploymentC).toFixed(2));
+            this.birthC = Number.parseFloat(((this.base < this.ratio.birthBase ? this.ratio.birthBase : this.base) * this.ratio.birthC).toFixed(2));
+            this.industrialInjuryC = Number.parseFloat(((this.base < this.ratio.industrialInjuryBase ? this.ratio.industrialInjuryBase : this.base) * this.ratio.industrialInjuryC).toFixed(2));
+            this.bigMedicalC = Number.parseFloat(((this.base < this.ratio.bigMedicalBase ? this.ratio.bigMedicalBase : this.base) * this.ratio.bigMedicalC).toFixed(2));
+            this.houseFundC = Number.parseFloat(((this.base < this.ratio.houseFundBase ? this.ratio.houseFundBase : this.base) * this.ratio.houseFundC).toFixed(0));
 
             this.calcTax();
         },
@@ -235,7 +235,7 @@ export default {
                 } else {
                     tax = 0;
                 }
-                this.tax = tax;
+                this.tax = Number.parseFloat(tax.toFixed(2));
             } else {
                 let waiting = temp - 3500;
                 let tax;
@@ -256,7 +256,7 @@ export default {
                 } else {
                     tax = 0;
                 }
-                this.tax = tax;
+                this.tax = Number.parseFloat(tax.toFixed(2));
             }
             this.calcReal();
         },
@@ -300,7 +300,9 @@ export default {
             .then(res => {
                 this.layer.close(index);
                 this.layer.msg(res.data.msg,{time:600})
-                this.$router.push({name:'homeLink'});
+                if(res.data.code == 200){
+                    this.$router.push({name:'homeLink'});
+                }
             })
             .catch(err => {
                 this.layer.close(index);
@@ -450,10 +452,12 @@ export default {
         color: green;
         font-weight: bold;
         background-color: cadetblue;
+        font-size: 20px;
     }
     input[name="SM_RealSalary"]{
-        color: orchid;
+        color: darkorchid;
         font-weight: bold;
         background-color: cadetblue;
+        font-size: 20px;
     }
 </style>
