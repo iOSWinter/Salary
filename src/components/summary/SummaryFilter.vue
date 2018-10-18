@@ -67,12 +67,12 @@ export default {
                 type: 'month',
                 format: 'yyyy年M月',
                 value: this.startDate,
-                // btns: ['clear', 'confirm'],
-                showBottom: false,
-                change:(date)=>{
-                    this.startDate = date;
-                    $('.layui-laydate').remove();
-                }
+                btns: ['clear', 'confirm'],
+                // showBottom: false,
+                // change:(date)=>{
+                //     this.startDate = date;
+                //     $('.layui-laydate').remove();
+                // }
             },);
         },
         renderEndDate(){
@@ -81,12 +81,12 @@ export default {
                 type: 'month',
                 format: 'yyyy年M月',
                 value: this.endDate,
-                // btns: ['clear', 'confirm'],
-                showBottom: false,
-                change:(date)=>{
-                    this.endDate = date;
-                    $('.layui-laydate').remove();
-                }
+                btns: ['clear', 'confirm'],
+                // showBottom: false,
+                // change:(date)=>{
+                //     this.endDate = date;
+                //     $('.layui-laydate').remove();
+                // }
             });
         },
         clickLabel(e){
