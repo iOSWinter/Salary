@@ -55,8 +55,17 @@ export default {
     },
     created(){
         let date = new Date();
-        this.startDate = `${date.getFullYear() - 1}年${date.getMonth() + 1}月`;
-        this.endDate = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+        if(this.$route.params.startDate != undefined){
+            this.startDate = this.$route.params.startDate;
+        } else {
+            this.startDate = `${date.getFullYear() - 1}年${date.getMonth() + 1}月`;
+        }
+
+        if(this.$route.params.endDate != undefined){
+            this.endDate = this.$route.params.endDate;
+        } else {
+            this.endDate = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+        }
     },
     mounted(){
         let items = this.$route.params.items;

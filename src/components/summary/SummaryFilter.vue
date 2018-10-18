@@ -3,7 +3,7 @@
             <div class="byYear"><input type="checkbox" name="byYear" @click="byYearClick"><p>按自然年汇总</p></div>
             <div class="date">
                 <p>日期范围</p>
-                <input name="startDate" v-model="startDate" placeholder="开始日期">至<input name="endDate" v-model="endDate" placeholder="结束日期">
+                <input name="startDate" v-model="startDate" readonly="readonly" placeholder="开始日期">至<input name="endDate" v-model="endDate" onfoucus="this.blur()" placeholder="结束日期">
             </div>
             <div class="items">
                 <div><p>个人收入类别</p></div>                
@@ -67,8 +67,13 @@ export default {
                 type: 'month',
                 format: 'yyyy年M月',
                 value: this.startDate,
-                btns: ['clear', 'confirm']
-            });
+                // btns: ['clear', 'confirm'],
+                showBottom: false,
+                change:(date)=>{
+                    this.startDate = date;
+                    $('.layui-laydate').remove();
+                }
+            },);
         },
         renderEndDate(){
             laydate.render({
@@ -76,19 +81,60 @@ export default {
                 type: 'month',
                 format: 'yyyy年M月',
                 value: this.endDate,
-                btns: ['clear', 'confirm']
+                // btns: ['clear', 'confirm'],
+                showBottom: false,
+                change:(date)=>{
+                    this.endDate = date;
+                    $('.layui-laydate').remove();
+                }
             });
         },
         clickLabel(e){
             let target = e.target;
             let name = target.getAttribute("name");
             let index = this.items.indexOf(name);
-            if(index >= 0){
-                this.items.splice(index, 1);
-                target.setAttribute("class","");
-            } else {
-                this.items.push(name)
-                target.setAttribute("class","checked");
+            if(target.getAttribute("disabled") == 'disabled'){
+                return;
+            }
+            if(name == 'theorySalary'){
+
+                if(index >= 0){
+                    $('label[name="realSalary"]').attr("disabled",false).css("color","#fff");
+                    $('label[name="increase"]').attr("disabled",false).css("color","#fff");
+                    $('label[name="reward"]').attr("disabled",false).css("color","#fff");
+                    this.items.splice(index, 1);
+                    target.setAttribute("class","");
+                } else {
+                    $('label[name="realSalary"]').attr({disabled:true,class:''}).css({color:"#aaa",backgroundColor:"#bbb"});
+                    $('label[name="increase"]').attr({disabled:true,class:''}).css({color:"#aaa",backgroundColor:"#bbb"});
+                    $('label[name="reward"]').attr({disabled:true,class:''}).css({color:"#aaa",backgroundColor:"#bbb"});
+                    if(this.items.indexOf('realSalary') >= 0){
+                        this.items.splice(this.items.indexOf('realSalary'),1)
+                    }
+                    if(this.items.indexOf('increase') >= 0){
+                        this.items.splice(this.items.indexOf('increase'),1)
+                    }
+                    if(this.items.indexOf('reward') >= 0){
+                        this.items.splice(this.items.indexOf('reward'),1)
+                    }
+                    this.items.push(name)
+                    target.setAttribute("class","checked");
+                }
+            }else {
+
+                let checkBox = $(target).parent().children("div").children("input");
+                if(index >= 0){
+                    $(checkBox).prop("checked", false);
+                    this.items.splice(index, 1);
+                    target.setAttribute("class","");
+                } else {
+                    this.items.push(name)
+                    target.setAttribute("class","checked");
+                    if($(target).parent().children("label").length == $(target).parent().children(".checked").length){
+
+                    $(checkBox).prop("checked", true);
+                    }
+                }
             }
         },
         checkAll(e){
@@ -114,14 +160,14 @@ export default {
             }
         },
         goBack(){
-            this.$router.go(-1);
+            this.$router.push({name:'summaryLink',params:{items:this.items,startDate:this.startDate,endDate:this.endDate}});
         },
         confirm(){
             if(this.items.length <= 0){
                 this.layer.msg("没有选择筛选项", {time : 1000});
                 return;
             }
-            this.$router.push({name:'summaryLink',params:{items:this.items}});
+            this.$router.push({name:'summaryLink',params:{items:this.items,startDate:this.startDate,endDate:this.endDate}});
         },
         byYearClick(e){
             let name = e.target.getAttribute("name");
@@ -145,15 +191,17 @@ export default {
         }
     },
     created(){
+        let date = new Date();
         if(this.$route.params.startDate != undefined){
             this.startDate = this.$route.params.startDate;
+        }else {
+            this.startDate = `${date.getFullYear() - 1}年${date.getMonth() + 1}月`;
         }
         if(this.$route.params.endDate != undefined){
             this.endDate = this.$route.params.endDate;
+        } else{
+            this.endDate = `${date.getFullYear()}年${date.getMonth() + 1}月`;
         }
-        let date = new Date();
-        this.startDate = `${date.getFullYear() - 1}年${date.getMonth() + 1}月`;
-        this.endDate = `${date.getFullYear()}年${date.getMonth() + 1}月`;
     },
     mounted(){
         let items = this.$route.params.items;
@@ -169,6 +217,10 @@ export default {
         }
         this.items.push(...items);       
         this.checkAllStatus(); 
+        if(this.items.indexOf("theorySalary") >= 0){
+            $("label[name='theorySalary']").click();
+            $("label[name='theorySalary']").click();
+        }
 
         this.renderStartDate();
         this.renderEndDate();
@@ -250,7 +302,7 @@ export default {
         line-height: 30px;
     }
     #summary-filter>.items>.checked{
-        background-color: green;
+        background-color: green!important;
     }
 
     #summary-filter>.bottom{
