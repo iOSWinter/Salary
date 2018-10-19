@@ -57,7 +57,8 @@ export default {
         return {
             startDate:'',
             endDate:'',
-            items:[]
+            items:[],
+            originalItems:[]
         }
     },
     methods:{
@@ -69,10 +70,10 @@ export default {
                 value: this.startDate,
                 btns: ['clear', 'confirm'],
                 // showBottom: false,
-                // change:(date)=>{
-                //     this.startDate = date;
-                //     $('.layui-laydate').remove();
-                // }
+                change:(date)=>{
+                    this.startDate = date;
+                    // $('.layui-laydate').remove();
+                }
             },);
         },
         renderEndDate(){
@@ -83,10 +84,10 @@ export default {
                 value: this.endDate,
                 btns: ['clear', 'confirm'],
                 // showBottom: false,
-                // change:(date)=>{
-                //     this.endDate = date;
-                //     $('.layui-laydate').remove();
-                // }
+                change:(date)=>{
+                    this.endDate = date;
+                    // $('.layui-laydate').remove();
+                }
             });
         },
         clickLabel(e){
@@ -160,7 +161,7 @@ export default {
             }
         },
         goBack(){
-            this.$router.push({name:'summaryLink',params:{items:this.items,startDate:this.startDate,endDate:this.endDate}});
+            this.$router.push({name:'summaryLink',params:{items:this.originalItems,startDate:this.startDate,endDate:this.endDate}});
         },
         confirm(){
             if(this.items.length <= 0){
@@ -215,7 +216,8 @@ export default {
                 $("label[name='"+ item +"']").addClass("checked");
             }
         }
-        this.items.push(...items);       
+        this.items.push(...items);
+        this.originalItems.push(...items);
         this.checkAllStatus(); 
         if(this.items.indexOf("theorySalary") >= 0){
             $("label[name='theorySalary']").click();
@@ -290,6 +292,10 @@ export default {
         width: 20px;
         height: 20px;
         font-size: 18px;
+        border: none;
+    }
+    input:checked{
+        background-color: #ccc;
     }
     #summary-filter>.items>label{
         background-color: #bbb;
