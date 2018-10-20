@@ -4,7 +4,7 @@
             <h4>{{add?"新增":"修改"}}记录</h4>
             <div class="item">
                 <p>发薪月份</p>
-                <input name="SM_YearMonth" type="text" placeholder="请输入发薪年月" v-model="month">
+                <input :disabled="!add" name="SM_YearMonth" type="text" placeholder="请输入发薪年月" v-model="month">
             </div>
         </div>
 
@@ -118,6 +118,7 @@
 </template>
 
 <script>
+import laydate from '../../../static/lib/laydate/laydate'
 import Tabbar from '../tabbar/Tabbar' 
 export default {
     components:{
@@ -125,10 +126,9 @@ export default {
     },
     data(){
         return {
-            setting:"设置",
             add:true,
             id:'',
-            month:'2018年9月',
+            month:`${new Date().getFullYear() - 1}年${new Date().getMonth() + 1}月`,
             base:0,
             increase:0,
             reduce:0,
@@ -256,14 +256,14 @@ export default {
                 } else {
                     tax = 0;
                 }
-                this.tax = Number.parseFloat(tax.toFixed(2));
+                this.tax = Number.parseFloat(tax).toFixed(2);
             }
             this.calcReal();
         },
         calcReal(e){
             
             let temp = this.theory - (this.retirement + this.medical + this.unemployment + this.birth + this.industrialInjury + this.bigMedical + this.houseFund);
-            this.real = temp - this.tax - this.meal;            
+            this.real = (temp - this.tax - this.meal).toFixed(2);            
         },
         submitClick(){
             if(this.month == ''){
@@ -274,6 +274,7 @@ export default {
             this.http.post("AddSalaryRecord",{
                 SM_Id:this.id,
                 SM_YearMonth:this.month,
+                SM_Base:this.base,
                 SM_Increase:this.increase,
                 SM_Reduce:this.reduce,
                 SM_Reward:this.reward,
@@ -337,7 +338,21 @@ export default {
             .catch(err => {
                 this.layer.msg("网络错误",{time:600});
             });
-        }
+        },
+        renderYearMonth(){
+            laydate.render({
+                elem: 'input[name="SM_YearMonth"]',
+                type: 'month',
+                format: 'yyyy年M月',
+                value: this.month,
+                btns: ['clear', 'confirm'],
+                // showBottom: false,
+                change:(date)=>{
+                    this.month = date;
+                    // $('.layui-laydate').remove();
+                }
+            },);
+        },
     },
     created(){
         if(this.$route.params.add != undefined){
@@ -348,6 +363,7 @@ export default {
             let index = this.layer.load();
             this.http.post("GetMonthDetail",{id:this.id})
             .then(res => {
+                console.log(res.data)
                 this.layer.close(index);
                 this.month = res.data.data.month;
                 this.base = res.data.data.baseSalary;
@@ -381,6 +397,9 @@ export default {
             })
         }
         this.getRatio();
+    },
+    mounted(){
+        this.renderYearMonth();
     }
 }
 </script>
