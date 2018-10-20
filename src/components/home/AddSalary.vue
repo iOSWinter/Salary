@@ -4,7 +4,7 @@
             <h4>{{add?"新增":"修改"}}记录</h4>
             <div class="item">
                 <p>发薪月份</p>
-                <input :disabled="!add" name="SM_YearMonth" type="text" placeholder="请输入发薪年月" v-model="month">
+                <input :disabled="!add" readonly="readonly" name="SM_YearMonth" type="text" placeholder="请输入发薪年月" v-model="month">
             </div>
         </div>
 
@@ -215,7 +215,7 @@ export default {
 
             this.theory = this.base + this.increase - this.reduce + this.reward;
             let temp = this.theory - (this.retirement + this.medical + this.unemployment + this.birth + this.industrialInjury + this.bigMedical + this.houseFund);
-            if(this.month > '2018年8月'){
+            if(this.month > '2018年08月'){
                 let waiting = temp - 5000;
                 let tax;
                 if(waiting > 80000){
@@ -343,15 +343,13 @@ export default {
             laydate.render({
                 elem: 'input[name="SM_YearMonth"]',
                 type: 'month',
-                format: 'yyyy年M月',
+                format: 'yyyy年MM月',
                 value: this.month,
                 btns: ['clear', 'confirm'],
-                // showBottom: false,
                 change:(date)=>{
                     this.month = date;
-                    // $('.layui-laydate').remove();
                 }
-            },);
+            });
         },
     },
     created(){
@@ -363,7 +361,6 @@ export default {
             let index = this.layer.load();
             this.http.post("GetMonthDetail",{id:this.id})
             .then(res => {
-                console.log(res.data)
                 this.layer.close(index);
                 this.month = res.data.data.month;
                 this.base = res.data.data.baseSalary;
@@ -389,7 +386,6 @@ export default {
                 this.tax = res.data.data.tax;
                 this.theory = res.data.data.theory;
                 this.real = res.data.data.real;
-
             })
             .catch(err => {            
                 this.layer.close(index);
