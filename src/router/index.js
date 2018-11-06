@@ -13,6 +13,7 @@ import Summary from '../components/summary/Summary'
 import SummaryFilter from '../components/summary/SummaryFilter'
 import Mine from '../components/mine/Mine'
 import Ratio from '../components/mine/Ratio'
+import Admin from '../components/mine/Admin'
 
 Vue.config.devtools = true;
 Vue.use(Router)
@@ -65,6 +66,11 @@ let router = new Router({
           path:'/ratio',
           name:'ratioLink',
           component:Ratio
+        },
+        {
+          path:'/admin',
+          name:'adminLink',
+          component:Admin
         }
       ]},
     {path:'*',redirect:'/home'},

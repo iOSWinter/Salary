@@ -1,31 +1,37 @@
 <template>
     <div id="mine">
-        <div class="top">
-            <div class="left">
-                <img :src="headUrl">
+        <div class="all">
+            <div class="top">
+                <div class="left">
+                    <img :src="headUrl">
+                </div>
+                <div class="right">
+                    <p>{{nick}}</p>
+                    <p>{{account}}</p>
+                    <p>{{registerTime}}</p>
+                </div>
             </div>
-            <div class="right">
-                <p>{{nick}}</p>
-                <p>{{account}}</p>
-                <p>{{registerTime}}</p>
-            </div>
-        </div>
-        <div class="option">
-            <div>
-                <p>{{recordMonthTitle}}</p>
-                <p>{{recordMonth}}</p>
-            </div>
-            <div @click="checkMineScore">
-                <p>{{mineScoreTitle}}</p>
-                <p>{{mineScore}}</p>
-            </div>
-            <div @click="setRatio">
-                <p>{{ratioTitle}}</p>
-                <i class="fa fa-arrow-circle-o-right"></i>
-            </div>
-            <div @click="checkHelp">
-                <p>{{help}}</p>
-                <i class="fa fa-arrow-circle-o-right"></i>
+            <div class="option">
+                <div>
+                    <p>{{recordMonthTitle}}</p>
+                    <p>{{recordMonth}}</p>
+                </div>
+                <div @click="checkMineScore">
+                    <p>{{mineScoreTitle}}</p>
+                    <p>{{mineScore}}</p>
+                </div>
+                <div @click="setRatio">
+                    <p>{{ratioTitle}}</p>
+                    <i class="fa fa-arrow-circle-o-right"></i>
+                </div>
+                <div @click="checkHelp">
+                    <p>{{help}}</p>
+                    <i class="fa fa-arrow-circle-o-right"></i>
+                </div>
+                <div v-if='admin' @click="adminClick">
+                    <p>{{adminTitle}}</p>
+                    <i class="fa fa-user-o"></i>
+                </div>
             </div>
         </div>
 
@@ -55,7 +61,9 @@ export default {
             mineScore:0,
             ratioTitle:'设置缴费比例',
             help:'使用帮助',
-            logoutTitle:'退出登录'
+            logoutTitle:'退出登录',
+            adminTitle:'系统管理',
+            admin:false
         }
     },
     methods:{
@@ -102,6 +110,20 @@ export default {
             .catch(err => {
                 this.layer.close(index);
                 this.layer.msg("网络错误", {time : 500});
+            })
+        },
+        adminClick(){
+            let index = this.layer.load();
+            this.http.post('token')
+            .then(res=>{
+                this.layer.close(index);
+                this.layer.msg('鉴权通过',{time:600},()=>{
+                    this.$router.push({name:'adminLink'});
+                });
+            })
+            .catch(err=>{
+                this.layer.close(index);
+                this.layer.msg('网络错误',{time:500});
             })
         },
 
@@ -171,6 +193,7 @@ export default {
             this.headUrl = `${'http://www.sichuanzg.com/Salary'}${res.data.data.headUrl}`;
             this.recordMonth = res.data.data.monthCount;
             this.mineScore = res.data.data.totalScore;
+            this.admin = (this.account == '17898181796');
         })
         .catch(err => {
             layer.msg('网络错误', {time:500});
@@ -189,6 +212,9 @@ export default {
         background-color: white;
         height: 100%;
         width: 100%;
+    }
+    #mine>.all{
+        padding-bottom: 100px;
     }
     .top{
         height: 130px;
